@@ -1334,7 +1334,7 @@ class TextFormat::Printer::TextGenerator
         memset(buffer_, ' ', buffer_size_);
       }
       size -= buffer_size_;
-      void* void_buffer;
+      void* void_buffer = nullptr;
       failed_ = !output_->Next(&void_buffer, &buffer_size_);
       if (failed_) return;
       buffer_ = reinterpret_cast<char*>(void_buffer);
