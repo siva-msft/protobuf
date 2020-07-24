@@ -281,7 +281,7 @@ StatusOr<uint32> ProtoStreamObjectSource::RenderMap(
   uint32 tag_to_return = 0;
   do {
     // Render map entry message type.
-    uint32 buffer32;
+    uint32 buffer32 = 0;
     stream_->ReadVarint32(&buffer32);  // message length
     int old_limit = stream_->PushLimit(buffer32);
     std::string map_key;
