@@ -281,7 +281,7 @@ StatusOr<uint32> ProtoStreamObjectSource::RenderMap(
   uint32 tag_to_return = 0;
   do {
     // Render map entry message type.
-    uint32 buffer32;
+    uint32 buffer32 = 0;
     stream_->ReadVarint32(&buffer32);  // message length
     int old_limit = stream_->PushLimit(buffer32);
     std::string map_key;
@@ -321,7 +321,7 @@ StatusOr<uint32> ProtoStreamObjectSource::RenderMap(
 
 Status ProtoStreamObjectSource::RenderPacked(
     const google::protobuf::Field* field, ObjectWriter* ow) const {
-  uint32 length;
+  uint32 length = 0;
   stream_->ReadVarint32(&length);
   int old_limit = stream_->PushLimit(length);
   while (stream_->BytesUntilLimit() > 0) {
@@ -501,7 +501,7 @@ Status ProtoStreamObjectSource::RenderString(const ProtoStreamObjectSource* os,
                                              StringPiece field_name,
                                              ObjectWriter* ow) {
   uint32 tag = os->stream_->ReadTag();
-  uint32 buffer32;
+  uint32 buffer32 = 0;
   std::string str;  // default value of empty for String wrapper
   if (tag != 0) {
     os->stream_->ReadVarint32(&buffer32);  // string size.
@@ -517,7 +517,7 @@ Status ProtoStreamObjectSource::RenderBytes(const ProtoStreamObjectSource* os,
                                             StringPiece field_name,
                                             ObjectWriter* ow) {
   uint32 tag = os->stream_->ReadTag();
-  uint32 buffer32;
+  uint32 buffer32 = 0;
   std::string str;
   if (tag != 0) {
     os->stream_->ReadVarint32(&buffer32);
@@ -613,12 +613,12 @@ Status ProtoStreamObjectSource::RenderAny(const ProtoStreamObjectSource* os,
     // //google/protobuf/any.proto
     if (field->number() == 1) {
       // read type_url
-      uint32 type_url_size;
+      uint32 type_url_size = 0;
       os->stream_->ReadVarint32(&type_url_size);
       os->stream_->ReadString(&type_url, type_url_size);
     } else if (field->number() == 2) {
       // read value
-      uint32 value_size;
+      uint32 value_size = 0;
       os->stream_->ReadVarint32(&value_size);
       os->stream_->ReadString(&value, value_size);
     }
@@ -680,7 +680,7 @@ Status ProtoStreamObjectSource::RenderFieldMask(
     const ProtoStreamObjectSource* os, const google::protobuf::Type& type,
     StringPiece field_name, ObjectWriter* ow) {
   std::string combined;
-  uint32 buffer32;
+  uint32 buffer32 = 0;
   uint32 paths_field_tag = 0;
   for (uint32 tag = os->stream_->ReadTag(); tag != 0;
        tag = os->stream_->ReadTag()) {
@@ -770,7 +770,7 @@ Status ProtoStreamObjectSource::RenderField(
   // and ends up using a lot of stack space. Keep the stack usage of this
   // message small in order to preserve stack space and not crash.
   if (field->kind() == google::protobuf::Field::TYPE_MESSAGE) {
-    uint32 buffer32;
+    uint32 buffer32 = 0;
     stream_->ReadVarint32(&buffer32);  // message length
     int old_limit = stream_->PushLimit(buffer32);
     // Get the nested message type for this field.
@@ -810,8 +810,8 @@ Status ProtoStreamObjectSource::RenderNonMessageField(
     const google::protobuf::Field* field, StringPiece field_name,
     ObjectWriter* ow) const {
   // Temporary buffers of different types.
-  uint32 buffer32;
-  uint64 buffer64;
+  uint32 buffer32 = 0;
+  uint64 buffer64 = 0;
   std::string strbuffer;
   switch (field->kind()) {
     case google::protobuf::Field::TYPE_BOOL: {
@@ -939,73 +939,73 @@ const std::string ProtoStreamObjectSource::ReadFieldValueAsString(
   std::string result;
   switch (field.kind()) {
     case google::protobuf::Field::TYPE_BOOL: {
-      uint64 buffer64;
+      uint64 buffer64 = 0;
       stream_->ReadVarint64(&buffer64);
       result = buffer64 != 0 ? "true" : "false";
       break;
     }
     case google::protobuf::Field::TYPE_INT32: {
-      uint32 buffer32;
+      uint32 buffer32 = 0;
       stream_->ReadVarint32(&buffer32);
       result = StrCat(bit_cast<int32>(buffer32));
       break;
     }
     case google::protobuf::Field::TYPE_INT64: {
-      uint64 buffer64;
+      uint64 buffer64 = 0;
       stream_->ReadVarint64(&buffer64);
       result = StrCat(bit_cast<int64>(buffer64));
       break;
     }
     case google::protobuf::Field::TYPE_UINT32: {
-      uint32 buffer32;
+      uint32 buffer32 = 0;
       stream_->ReadVarint32(&buffer32);
       result = StrCat(bit_cast<uint32>(buffer32));
       break;
     }
     case google::protobuf::Field::TYPE_UINT64: {
-      uint64 buffer64;
+      uint64 buffer64 = 0;
       stream_->ReadVarint64(&buffer64);
       result = StrCat(bit_cast<uint64>(buffer64));
       break;
     }
     case google::protobuf::Field::TYPE_SINT32: {
-      uint32 buffer32;
+      uint32 buffer32 = 0;
       stream_->ReadVarint32(&buffer32);
       result = StrCat(WireFormatLite::ZigZagDecode32(buffer32));
       break;
     }
     case google::protobuf::Field::TYPE_SINT64: {
-      uint64 buffer64;
+      uint64 buffer64 = 0;
       stream_->ReadVarint64(&buffer64);
       result = StrCat(WireFormatLite::ZigZagDecode64(buffer64));
       break;
     }
     case google::protobuf::Field::TYPE_SFIXED32: {
-      uint32 buffer32;
+      uint32 buffer32 = 0;
       stream_->ReadLittleEndian32(&buffer32);
       result = StrCat(bit_cast<int32>(buffer32));
       break;
     }
     case google::protobuf::Field::TYPE_SFIXED64: {
-      uint64 buffer64;
+      uint64 buffer64 = 0;
       stream_->ReadLittleEndian64(&buffer64);
       result = StrCat(bit_cast<int64>(buffer64));
       break;
     }
     case google::protobuf::Field::TYPE_FIXED32: {
-      uint32 buffer32;
+      uint32 buffer32 = 0;
       stream_->ReadLittleEndian32(&buffer32);
       result = StrCat(bit_cast<uint32>(buffer32));
       break;
     }
     case google::protobuf::Field::TYPE_FIXED64: {
-      uint64 buffer64;
+      uint64 buffer64 = 0;
       stream_->ReadLittleEndian64(&buffer64);
       result = StrCat(bit_cast<uint64>(buffer64));
       break;
     }
     case google::protobuf::Field::TYPE_FLOAT: {
-      uint32 buffer32;
+      uint32 buffer32 = 0;
       stream_->ReadLittleEndian32(&buffer32);
       result = SimpleFtoa(bit_cast<float>(buffer32));
       break;
