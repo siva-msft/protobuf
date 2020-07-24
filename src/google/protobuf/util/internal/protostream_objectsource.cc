@@ -281,7 +281,7 @@ StatusOr<uint32> ProtoStreamObjectSource::RenderMap(
   uint32 tag_to_return = 0;
   do {
     // Render map entry message type.
-    uint32 buffer32;
+    uint32 buffer32 = 0;
     stream_->ReadVarint32(&buffer32);  // message length
     int old_limit = stream_->PushLimit(buffer32);
     std::string map_key;
@@ -321,7 +321,7 @@ StatusOr<uint32> ProtoStreamObjectSource::RenderMap(
 
 Status ProtoStreamObjectSource::RenderPacked(
     const google::protobuf::Field* field, ObjectWriter* ow) const {
-  uint32 length;
+  uint32 length = 0;
   stream_->ReadVarint32(&length);
   int old_limit = stream_->PushLimit(length);
   while (stream_->BytesUntilLimit() > 0) {
@@ -501,7 +501,7 @@ Status ProtoStreamObjectSource::RenderString(const ProtoStreamObjectSource* os,
                                              StringPiece field_name,
                                              ObjectWriter* ow) {
   uint32 tag = os->stream_->ReadTag();
-  uint32 buffer32;
+  uint32 buffer32 = 0;
   std::string str;  // default value of empty for String wrapper
   if (tag != 0) {
     os->stream_->ReadVarint32(&buffer32);  // string size.
@@ -517,7 +517,7 @@ Status ProtoStreamObjectSource::RenderBytes(const ProtoStreamObjectSource* os,
                                             StringPiece field_name,
                                             ObjectWriter* ow) {
   uint32 tag = os->stream_->ReadTag();
-  uint32 buffer32;
+  uint32 buffer32 = 0;
   std::string str;
   if (tag != 0) {
     os->stream_->ReadVarint32(&buffer32);
